@@ -11,8 +11,10 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "bluebird": "^3.5.1",
     "dravatar": "^1.0.2",
     "iview": "^2.13.1",
+    "ramda": "^0.25.0",
     "superagent": "^3.8.3",
     "vue": "^2.5.2",
     "vue-async-computed": "^3.3.1",

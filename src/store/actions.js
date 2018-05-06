@@ -14,7 +14,7 @@
 // Please use commit() to update the state.
 
 // import * as types from './mutation-types';
-import { getMyAddr } from '@/api'
+import { getMe } from '@/api'
 export default {
   // async initLocale ({ commit }) {
   //   const locale = await api.getLocale()
@@ -25,9 +25,9 @@ export default {
   //   commit('setLocale', locale)
   // },
   async fetchAccount ({ commit }) {
-    let account = null
+    let account = {}
     try {
-      account = await getMyAddr()
+      account = await getMe()
       commit('setAccount', account)
     } catch (error) {
       commit('setAccount', undefined)

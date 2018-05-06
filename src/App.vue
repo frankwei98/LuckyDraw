@@ -8,7 +8,7 @@
               </Card>
             </Content>
         </Layout>
-        <Footer> Qbao AirDropper </Footer>
+        <Footer> Qbao AirDropper All Right Reserved</Footer>
   </div>
 </template>
 

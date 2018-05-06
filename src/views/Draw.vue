@@ -5,36 +5,46 @@
       h1| 请使用 MetaMask 登录
       h3| 无法访问你的 Web3 接口，请登录后抽卡
     #draw(v-if="account")
-      h1.title| 抽奖 Demo
-      Col(span="8" :xs="24" :md="8")
-          h1| 我的账户
-          Tooltip(placement="right")
-            div(slot="content")
-              p| 这是 Dravatar, 你的以太坊通用账户头像
-              p| 你可以去 dravatar.xyz 修改你的头像
-            Avatar(:src="getAvatar" shape="square" size="large")
-          h3| {{acct}}
-          Button(type="primary" size="large" icon="ios-pulse-strong" @click="draw")| 搏一搏!
-      Col(span="16" :xs="24" :md="16")
-          Spin(v-if="pricesRow.length === 0" size="large" fix)
-          Row
-          Col(:xs="12" :sm="8" :md="8" :lg="6" style="min-height: 100px" v-for="element in pricesRow" :key="element.name" :class="isSelect(element)")
-              img(:src="element.img" style="width: 128px")
-              p| {{element.name}}
+    Row(gutter="20")
+        //- h1.title| 幸运回旋
+        Col(span="8" :xs="24" :md="8")
+            //- h1| 我的账户
+            //- Tooltip(placement="right")
+            //-   div(slot="content")
+            //-     p| 这是 Dravatar, 你的以太坊通用账户头像
+            //-     p| 你可以去 dravatar.xyz 修改你的头像
+            //-   Avatar(:src="getAvatar" shape="square" size="large")
+            //- h3| 账户尾号 {{acct}}
+            //- h3| 账户余额 {{getBalance}} ETH
+            AccountView
+              Button(type="primary" size="large" icon="ios-pulse-strong" @click="draw" long)| 搏一搏!
+              Button(type="primary" size="large" icon="ios-pulse-strong" @click="draw" long disabled)| 我的奖品
+              Button(type="primary" size="large" icon="eye" @click="draw" long disabled)| 奖池明细
+        Col(span="16" :xs="24" :md="16")
+            h1| 幸运回旋
+            Spin(v-if="pricesRow.length === 0" size="large" fix)
+            Row
+            Col(:xs="12" :sm="8" :md="8" :lg="6" style="min-height: 100px"
+            v-for="element in pricesRow" :key="element.name" :class="isSelect(element)")
+                img(:src="element.img" style="width: 128px")
+                p| {{element.name}}
 
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import AccountView from '../components/Account'
 import { Button, Row, Col, Modal, Avatar, Tooltip, Spin, Icon } from 'iview'
 import request from 'superagent'
 import { getRandomInteger } from '../random'
 import Dravatar from 'dravatar'
+import { map } from 'ramda'
 export default {
   name: 'HelloWorld',
   components: {
     Button,
     Tooltip,
+    AccountView,
     Spin,
     Icon,
     Avatar,
@@ -43,14 +53,19 @@ export default {
   },
   asyncComputed: {
     async getAvatar () {
-      const uri = await Dravatar(this.account)
+      const uri = await Dravatar(this.account.address)
       return uri
     }
   },
   computed: {
     ...mapState(['account']),
     acct () {
-      return this.account.slice(-6)
+      return this.account ? this.account.address.slice(-6) : ''
+    },
+    getBalance () {
+      const toFix2 = (num) => num.toFixed(2)
+      const balance = this.account.balance
+      return balance !== undefined ? toFix2(balance) : 0
     }
   },
   data () {
@@ -59,7 +74,6 @@ export default {
     }
   },
   async created () {
-    console.log(this.account)
     this.pricesRow = await this.fetchPrizes()
   },
   methods: {
@@ -71,7 +85,8 @@ export default {
         'https://easy-mock.com/mock/5aea9745f0c3f57c582874b8/prizesmock/getPrizesList'
       const res = await request.get(api)
       const data = res.body.data
-      return data.map(prize => ({ ...prize, isSelected: false }))
+      return map(prize => ({ ...prize, isSelected: false }), data)
+      // return data.map(prize => ({ ...prize, isSelected: false }))
     },
     changeColState (data) {
       return col => {
@@ -154,8 +169,8 @@ export default {
   float: none;
   display: inline-block;
 }
-.ivu-avatar-large {
-  width: 100%;
-  height: 100%;
+button {
+      margin: 5px;
+    min-height: 40px;
 }
 </style>
