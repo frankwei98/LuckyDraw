@@ -5,7 +5,10 @@ import App from './App'
 // import './style/app.scss'
 import router from './router'
 import store from './store'
+import AsyncComputed from 'vue-async-computed'
+
 // Vue.use(Buefy)
+Vue.use(AsyncComputed)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

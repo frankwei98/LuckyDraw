@@ -16,12 +16,9 @@ export default {
   setLocale (state, locale) {
     state.locale = locale
   },
-  setAccount (state, { account, signature }) {
+  setAccount (state, account) {
     console.log(account)
-    state.account = {
-      account,
-      signature
-    }
+    state.account = account
     return new Promise((resolve, reject) => {
       resolve()
     })

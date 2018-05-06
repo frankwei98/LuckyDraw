@@ -8,7 +8,7 @@
               </Card>
             </Content>
         </Layout>
-
+        <Footer> Qbao AirDropper </Footer>
   </div>
 </template>
 
@@ -24,6 +24,9 @@ export default {
     Footer,
     Layout,
     Content
+  },
+  created () {
+    this.$store.dispatch('fetchAccount')
   }
 }
 </script>

@@ -1,43 +1,65 @@
 <template lang="pug">
   .container
-    h1.title| 抽奖 Demo
-    Col(span="16")
-        Row
-        Col(span="8" style="min-height: 100px" v-for="element in pricesRow" :key="element.name" :class="isSelect(element)")
-            img(:src="element.img" style="width: 128px")
-            p| {{element.name}}
-    Col(span="8")
-        Button(type="primary" size="large" icon="ios-pulse-strong" @click="draw")| 搏一搏!
+    #login(v-if="!account")
+      Icon(type="close" style="font-size: 16rem; color: #ef2626e8")
+      h1| 请使用 MetaMask 登录
+      h3| 无法访问你的 Web3 接口，请登录后抽卡
+    #draw(v-if="account")
+      h1.title| 抽奖 Demo
+      Col(span="8" :xs="24" :md="8")
+          h1| 我的账户
+          Tooltip(placement="right")
+            div(slot="content")
+              p| 这是 Dravatar, 你的以太坊通用账户头像
+              p| 你可以去 dravatar.xyz 修改你的头像
+            Avatar(:src="getAvatar" shape="square" size="large")
+          h3| {{acct}}
+          Button(type="primary" size="large" icon="ios-pulse-strong" @click="draw")| 搏一搏!
+      Col(span="16" :xs="24" :md="16")
+          Spin(v-if="pricesRow.length === 0" size="large" fix)
+          Row
+          Col(:xs="12" :sm="8" :md="8" :lg="6" style="min-height: 100px" v-for="element in pricesRow" :key="element.name" :class="isSelect(element)")
+              img(:src="element.img" style="width: 128px")
+              p| {{element.name}}
+
 </template>
 
 <script>
-import { Button, Row, Col, Modal } from 'iview'
+import { mapState } from 'vuex'
+import { Button, Row, Col, Modal, Avatar, Tooltip, Spin, Icon } from 'iview'
 import request from 'superagent'
 import { getRandomInteger } from '../random'
+import Dravatar from 'dravatar'
 export default {
   name: 'HelloWorld',
   components: {
     Button,
+    Tooltip,
+    Spin,
+    Icon,
+    Avatar,
     Row,
     Col
   },
+  asyncComputed: {
+    async getAvatar () {
+      const uri = await Dravatar(this.account)
+      return uri
+    }
+  },
+  computed: {
+    ...mapState(['account']),
+    acct () {
+      return this.account.slice(-6)
+    }
+  },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App',
-      pricesRow: [
-        // { name: '1' },
-        // { name: '2' },
-        // { name: '3' },
-        // { name: '4' },
-        // { name: '5' },
-        // { name: '6' },
-        // { name: '7' },
-        // { name: '8' },
-        // { name: '9' }
-      ]
+      pricesRow: []
     }
   },
   async created () {
+    console.log(this.account)
     this.pricesRow = await this.fetchPrizes()
   },
   methods: {
@@ -51,40 +73,69 @@ export default {
       const data = res.body.data
       return data.map(prize => ({ ...prize, isSelected: false }))
     },
-    async draw () {
-      const data = [...this.pricesRow] //
-      const changeColState = col => {
+    changeColState (data) {
+      return col => {
         let curData = data.map(element =>
           Object.assign(element, { isSelected: false })
         )
-        curData[col] = Object.assign(curData[randomNumber], {
+        curData[col] = Object.assign(curData[col], {
           isSelected: true
         })
         return curData
       }
-      let randomNumber = 0
-      const randomFn = this.getRandomizer(0, 8)
-      const randomIteration = () => {
-        randomNumber = randomFn()
-        this.pricesRow = changeColState(randomNumber)
-      }
-      var intervalId = setInterval(randomIteration, 200)
-      const num = await getRandomInteger(0, 8)
-      setTimeout(() => {
-        clearInterval(intervalId)
-        randomNumber = num
-        changeColState(randomNumber)
-        const content = `你抽到了 ${randomNumber + 1} 号奖品`
+    },
+    async draw () {
+      // 使用Promise完成模拟同步 Timeout
+      const sleep = (ms) => new Promise((resolve, reject) => {
+        setTimeout(() => { resolve(ms) }, ms)
+      })
+
+      const winningPrompt = (number) => {
+        changeColState(number)
+        const content = `你抽到了 ${number + 1} 号奖品`
         Modal.success({
           title: '抽奖成功',
           content
         })
-      }, 3000)
-    },
-    getRandomizer (bottom, top) {
-      return function () {
-        return Math.floor(Math.random() * (1 + top - bottom)) + bottom
       }
+
+      const data = [...this.pricesRow]
+      // changeColState 获得的是一个 function
+      const changeColState = this.changeColState(data)
+      let number = 0
+      const iteration = () => {
+        if (number >= data.length - 1) {
+          number = 0
+        } else {
+          number += 1
+        }
+        changeColState(number)
+      }
+      const intervalId = setInterval(iteration, 100)
+      const num = await getRandomInteger(0, 8)
+      clearInterval(intervalId)
+      // 开始放慢速度
+      for (let i = 1; i <= 3; i++) {
+        let delayPerItem = i * 1250 / data.length
+        console.log(delayPerItem)
+        for (let i = 0; i < data.length; i++) {
+          iteration()
+          await sleep(delayPerItem)
+        }
+      }
+      // 慢慢迭代到奖品格
+      while (true) {
+        if (number === num) {
+          changeColState(num)
+          break
+        } else {
+          iteration()
+          changeColState(number)
+          await sleep(650)
+        }
+      }
+      // number = num
+      winningPrompt(num)
     }
   }
 }
@@ -97,5 +148,14 @@ export default {
 }
 .selected {
   background: #ffec3d;
+  opacity: 0.8;
+}
+.ivu-col {
+  float: none;
+  display: inline-block;
+}
+.ivu-avatar-large {
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -25,8 +25,12 @@ export default {
   //   commit('setLocale', locale)
   // },
   async fetchAccount ({ commit }) {
-    const account = await getMyAddr()
-    const signature = null
-    commit('setAccount', { account, signature })
+    let account = null
+    try {
+      account = await getMyAddr()
+      commit('setAccount', account)
+    } catch (error) {
+      commit('setAccount', undefined)
+    }
   }
 }
