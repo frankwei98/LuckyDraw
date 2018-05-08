@@ -5,21 +5,17 @@
       h1| 请使用 MetaMask 登录
       h3| 无法访问你的 Web3 接口，请登录后抽卡
     #draw(v-if="account")
-    Row(gutter="20")
+    Row(:gutter="20")
         //- h1.title| 幸运回旋
         Col(span="8" :xs="24" :md="8")
-            //- h1| 我的账户
-            //- Tooltip(placement="right")
-            //-   div(slot="content")
-            //-     p| 这是 Dravatar, 你的以太坊通用账户头像
-            //-     p| 你可以去 dravatar.xyz 修改你的头像
-            //-   Avatar(:src="getAvatar" shape="square" size="large")
-            //- h3| 账户尾号 {{acct}}
-            //- h3| 账户余额 {{getBalance}} ETH
             AccountView
-              Button(type="primary" size="large" icon="ios-pulse-strong" @click="draw" long)| 搏一搏!
-              Button(type="primary" size="large" icon="ios-pulse-strong" @click="draw" long disabled)| 我的奖品
-              Button(type="primary" size="large" icon="eye" @click="draw" long disabled)| 奖池明细
+              Button(type="primary" size="large"
+              icon="ios-pulse-strong" @click="draw" long)| 搏一搏!
+              router-link(to="/my")
+                Button(type="primary" size="large"
+                icon="ios-pulse-strong" long)| 我的奖品
+              Button(type="primary" size="large"
+              icon="eye" @click="draw" long disabled)| 奖池明细
         Col(span="16" :xs="24" :md="16")
             h1| 幸运回旋
             Spin(v-if="pricesRow.length === 0" size="large" fix)
@@ -36,9 +32,9 @@ import { mapState } from 'vuex'
 import AccountView from '../components/Account'
 import { Button, Row, Col, Modal, Avatar, Tooltip, Spin, Icon } from 'iview'
 import request from 'superagent'
-import { getRandomInteger } from '../random'
 import Dravatar from 'dravatar'
 import { map } from 'ramda'
+import LuckyPackageContract from '@/contract/LuckyPackageContract'
 export default {
   name: 'HelloWorld',
   components: {
@@ -60,7 +56,8 @@ export default {
   computed: {
     ...mapState(['account']),
     acct () {
-      return this.account ? this.account.address.slice(-6) : ''
+      const address = this.account.address
+      return address !== undefined ? address.slice(-6) : ''
     },
     getBalance () {
       const toFix2 = (num) => num.toFixed(2)
@@ -100,20 +97,31 @@ export default {
       }
     },
     async draw () {
+      const contract = new LuckyPackageContract()
+      await contract.initialize()
+
+      try {
+        const rollTxResult = await contract.rollDice(1, this.account.address)
+        console.log(rollTxResult)
+        console.log(JSON.stringify(rollTxResult))
+        await this.startToRoll(rollTxResult)
+      } catch (error) {
+        alert('Rolldice Transaction have been rejected')
+      }
+    },
+    async startToRoll ({prizeId, prizeIssuer}) {
       // 使用Promise完成模拟同步 Timeout
       const sleep = (ms) => new Promise((resolve, reject) => {
         setTimeout(() => { resolve(ms) }, ms)
       })
-
-      const winningPrompt = (number) => {
+      const winningPrompt = (number, prizeIssuer) => {
         changeColState(number)
-        const content = `你抽到了 ${number + 1} 号奖品`
+        const content = `你抽到了 ${prizeIssuer} 发出的 ${number + 1} 号奖品`
         Modal.success({
           title: '抽奖成功',
           content
         })
       }
-
       const data = [...this.pricesRow]
       // changeColState 获得的是一个 function
       const changeColState = this.changeColState(data)
@@ -127,7 +135,7 @@ export default {
         changeColState(number)
       }
       const intervalId = setInterval(iteration, 100)
-      const num = await getRandomInteger(0, 8)
+      const num = Number(prizeId)
       clearInterval(intervalId)
       // 开始放慢速度
       for (let i = 1; i <= 3; i++) {
@@ -150,7 +158,7 @@ export default {
         }
       }
       // number = num
-      winningPrompt(num)
+      winningPrompt(num, prizeIssuer)
     }
   }
 }
