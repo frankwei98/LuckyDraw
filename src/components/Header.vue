@@ -8,20 +8,21 @@ header
                     Icon(:type="menu.icon")
                     span|{{menu.name}}
             MenuItem(name="Network")
-                    Icon(type="wifi")
+                    EtherIcon
                     span|{{getNetwork.name}}
             MenuItem(name="Balance")
                     p|余额: {{getBalance}} ETH
 </template>
 
 <script>
+import EtherIcon from './EtherIcon'
 import { mapState } from 'vuex'
 import { Header, Menu, MenuItem, Icon } from 'iview'
 import { getNetwork } from '@/api'
 
 export default {
   name: 'Header',
-  components: { 'header': Header, Menu, MenuItem, Icon },
+  components: { 'header': Header, EtherIcon, Menu, MenuItem, Icon },
   async created () {
   },
   asyncComputed: {
@@ -50,6 +51,11 @@ export default {
           icon: 'ios-box',
           name: '抽卡',
           to: '/draw'
+        },
+        {
+          icon: 'user',
+          name: '我的',
+          to: '/my'
         }
       ]
     }

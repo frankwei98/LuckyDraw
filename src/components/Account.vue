@@ -8,6 +8,9 @@
             Avatar(:src="getAvatar" shape="square" size="large")
           h3| 账户尾号 {{acct}}
           h3| 账户余额 {{getBalance}} ETH
+          h3| 你有 {{getChances}} 次抽奖机会
+          h4| 幸运币库存: {{getTotalSupply}}
+          h4| 是不是管理员: {{isContractAdmin}}
           slot
 </template>
 
@@ -15,6 +18,7 @@
 import { mapState } from 'vuex'
 import { Tooltip, Avatar } from 'iview'
 import Dravatar from 'dravatar'
+import { getLuckTokensOfLength, getTokenTotalSupply, isContractAdmin } from '@/contract/luckyPackage'
 
 export default {
   components: {
@@ -25,6 +29,18 @@ export default {
     async getAvatar () {
       const uri = await Dravatar(this.account.address)
       return uri
+    },
+    async getChances () {
+      const result = await getLuckTokensOfLength(this.account.address)
+      return result
+    },
+    async getTotalSupply () {
+      const result = await getTokenTotalSupply()
+      return result
+    },
+    async isContractAdmin () {
+      const result = await isContractAdmin(this.account.address)
+      return result
     }
   },
   computed: {
