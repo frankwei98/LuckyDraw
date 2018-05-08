@@ -8,9 +8,8 @@
             Avatar(:src="getAvatar" shape="square" size="large")
           h3| 账户尾号 {{acct}}
           h3| 账户余额 {{getBalance}} ETH
-          h3| 你有 {{getChances}} 次抽奖机会
-          h4| 幸运币库存: {{getTotalSupply}}
-          h4| 是不是管理员: {{isContractAdmin}}
+          h3| 你有 {{userStatus.tokensQty}} 次抽奖机会
+          h4| 是不是管理员: {{userStatus.isAdmin}}
           slot
 </template>
 
@@ -18,7 +17,7 @@
 import { mapState } from 'vuex'
 import { Tooltip, Avatar } from 'iview'
 import Dravatar from 'dravatar'
-import { getLuckTokensOfLength, getTokenTotalSupply, isContractAdmin } from '@/contract/luckyPackage'
+import LuckyPackageContract from '@/contract/LuckyPackageContract'
 
 export default {
   components: {
@@ -27,26 +26,38 @@ export default {
   },
   asyncComputed: {
     async getAvatar () {
-      const uri = await Dravatar(this.account.address)
+      const uri = await Dravatar(this.address)
       return uri
-    },
-    async getChances () {
-      const result = await getLuckTokensOfLength(this.account.address)
-      return result
-    },
-    async getTotalSupply () {
-      const result = await getTokenTotalSupply()
-      return result
-    },
-    async isContractAdmin () {
-      const result = await isContractAdmin(this.account.address)
-      return result
+    }
+  },
+  data () {
+    return {
+      contract: null,
+      userStatus: {}
+    }
+  },
+  async created () {
+    this.contract = new LuckyPackageContract()
+    await this.contract.initialize()
+    this.userStatus = await this.getUserStatus()
+  },
+  methods: {
+    async getUserStatus () {
+      const contract = this.contract
+      const isAdmin = await contract.isContractAdmin(this.address)
+      const tokensQty = await contract.getLuckTokensOfLength(this.address)
+      const newObj = {isAdmin, tokensQty}
+      console.log(newObj)
+      return newObj
     }
   },
   computed: {
     ...mapState(['account']),
+    address () {
+      return this.account ? this.account.address : ''
+    },
     acct () {
-      return this.account ? this.account.address.slice(-6) : ''
+      return this.account ? this.address.slice(-6) : ''
     },
     getBalance () {
       const toFix2 = num => num.toFixed(2)

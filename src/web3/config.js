@@ -33,8 +33,6 @@ export const network = {
     // default: true,
     name: 'Private Network',
     contract: '0xbfc0d79e791dc9cd8b242a008ed0510e42a2de',
-    ERC20Package: '0x299001887ed07bdc619688176231a865264ae',
-    ERC20: '0x8fed7212efd7ed42c38242105875bffaa2fff',
     rpc: 'http://127.0.0.1:7546'
   }
 }

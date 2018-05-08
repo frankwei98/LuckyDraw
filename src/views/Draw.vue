@@ -67,10 +67,12 @@ export default {
   },
   data () {
     return {
-      pricesRow: []
+      pricesRow: [],
+      contract: null
     }
   },
   async created () {
+    this.contract = await this.initContract()
     this.pricesRow = await this.fetchPrizes()
   },
   methods: {
@@ -96,10 +98,13 @@ export default {
         return curData
       }
     },
-    async draw () {
+    async initContract () {
       const contract = new LuckyPackageContract()
       await contract.initialize()
-
+      return contract
+    },
+    async draw () {
+      const contract = this.contract
       try {
         const rollTxResult = await contract.rollDice(1, this.account.address)
         console.log(rollTxResult)
