@@ -13,6 +13,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "dravatar": "^1.0.2",
+    "element-ui": "^2.3.7",
     "iview": "^2.13.1",
     "ramda": "^0.25.0",
     "superagent": "^3.8.3",
