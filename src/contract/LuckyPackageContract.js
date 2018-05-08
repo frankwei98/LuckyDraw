@@ -42,8 +42,7 @@ export default class LuckyPackageContract extends Contract {
   }
   // 获取某人所拥有的LuckyToken张数
   async getLuckTokensOfLength (address) {
-    const ids = await LuckyPackageContract
-      .methods.tokensOf(address).call()
+    const ids = await this.contract.methods.tokensOf(address).call()
     console.log(ids)
     return ids.length
   }
@@ -81,8 +80,7 @@ export default class LuckyPackageContract extends Contract {
   }
 
   async getTokenTotalSupply () {
-    const size = await LuckyPackageContract
-      .methods.totalSupply().call()
+    const size = await this.contract.methods.totalSupply().call()
     return Number(size)
   }
 
