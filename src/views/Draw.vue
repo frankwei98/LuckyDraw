@@ -34,7 +34,7 @@ import { Button, Row, Col, Modal, Avatar, Tooltip, Spin, Icon } from 'iview'
 import request from 'superagent'
 import Dravatar from 'dravatar'
 import { map } from 'ramda'
-import LuckyPackageContract from '@/contract/LuckyPackageContract'
+import LuckyPackageContract from '@/contract/LuckyPackage'
 export default {
   name: 'HelloWorld',
   components: {

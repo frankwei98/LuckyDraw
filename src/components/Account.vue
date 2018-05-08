@@ -17,7 +17,7 @@
 import { mapState } from 'vuex'
 import { Tooltip, Avatar } from 'iview'
 import Dravatar from 'dravatar'
-import LuckyPackageContract from '@/contract/LuckyPackageContract'
+import LuckyPackageContract from '@/contract/LuckyPackage'
 
 export default {
   components: {

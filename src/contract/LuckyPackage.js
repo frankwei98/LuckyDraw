@@ -3,10 +3,6 @@ import Contract from './ContractWrapper'
 import abi from './abi/LuckyPackage.json'
 
 export default class LuckyPackageContract extends Contract {
-  constructor () {
-    super(web3)
-  }
-
   async initialize () {
     const contractName = 'contract'
     await super.initialize({ abi, contractName })
