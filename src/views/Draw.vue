@@ -7,7 +7,7 @@
     #draw(v-if="account")
     Row(:gutter="20")
         //- h1.title| 幸运回旋
-        Col(span="8" :xs="24" :md="8")
+        Col(span="8" :xs="24" :md="8" :lg="6")
             AccountView
               Button(type="primary" size="large"
               icon="ios-pulse-strong" @click="draw" long)| 搏一搏!
@@ -16,21 +16,22 @@
                 icon="ios-pulse-strong" long)| 我的奖品
               Button(type="primary" size="large"
               icon="eye" @click="draw" long disabled)| 奖池明细
-        Col(span="16" :xs="24" :md="16")
+        Col(span="16" :xs="24" :md="16" :lg="18")
+          Card
             h1| 幸运回旋
             Spin(v-if="pricesRow.length === 0" size="large" fix)
             Row
-            Col(:xs="12" :sm="8" :md="8" :lg="6" style="min-height: 100px"
-            v-for="element in pricesRow" :key="element.name" :class="isSelect(element)")
-                img(:src="element.img" style="width: 128px")
-                p| {{element.name}}
+              Col(:xs="12" :sm="8" :md="8" :lg="6" style="min-height: 100px"
+              v-for="element in pricesRow" :key="element.name" :class="isSelect(element)")
+                  img(:src="element.img" style="width: 128px")
+                  p| {{element.name}}
 
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import AccountView from '../components/Account'
-import { Button, Row, Col, Modal, Avatar, Tooltip, Spin, Icon } from 'iview'
+import { Button, Row, Col, Modal, Avatar, Tooltip, Spin, Icon, Card } from 'iview'
 import request from 'superagent'
 import Dravatar from 'dravatar'
 import { map } from 'ramda'
@@ -42,6 +43,7 @@ export default {
     Tooltip,
     AccountView,
     Spin,
+    Card,
     Icon,
     Avatar,
     Row,
@@ -178,10 +180,10 @@ export default {
   background: #ffec3d;
   opacity: 0.8;
 }
-.ivu-col {
+/* .ivu-col {
   float: none;
   display: inline-block;
-}
+} */
 button {
       margin: 5px;
     min-height: 40px;

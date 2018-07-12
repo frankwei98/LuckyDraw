@@ -1,5 +1,5 @@
 <template lang="pug">
-  #account
+  Card
           h1| 我的账户
           Tooltip(placement="right")
             div(slot="content")
@@ -15,14 +15,15 @@
 
 <script>
 import { mapState } from 'vuex'
-import { Tooltip, Avatar } from 'iview'
+import { Tooltip, Avatar, Card } from 'iview'
 import Dravatar from 'dravatar'
 import LuckyPackageContract from '@/contract/LuckyPackage'
 
 export default {
   components: {
     Tooltip,
-    Avatar
+    Avatar,
+    Card
   },
   asyncComputed: {
     async getAvatar () {

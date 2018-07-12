@@ -1,28 +1,42 @@
 <template lang="pug">
-  #home
-    h1| 欢迎来到 Qbao 卡牌空投
-    h2| 我们提供游戏抽卡、卡牌空投服务
-    router-link(:to="{name: 'Draw'}")|
-        Button(type="primary" size="large")| 现在抽卡
-    router-link(:to="{name: 'Contact'}")|
-        Button(type="primary" size="large")| 空投合作联系
+  Card
+    h1.title| Qbao AirDropper
+    p.subtitle| 一个服务于区块链游戏创作者和游戏爱好者的平台。
+    .btns
+      Button(type="primary" size="large" circle @click="jumpTo('Draw')")| 现在抽卡
+      Button(type="ghost" size="large" circle @click="jumpTo('Contact')" )| 空投合作联系
 </template>
 
 <script>
-import { Button } from 'iview'
+import { Button, Card } from 'iview'
 export default {
   name: 'Home',
   components: {
-    Button
+    Button,
+    Card
   },
   created () {
     console.log(this.$router)
+  },
+  methods: {
+    jumpTo (name) {
+      this.$router.push({name: name})
+    }
   }
 }
 </script>
 
 <style scoped>
-#home * {
+/* #home * {
   margin: 2.5px
+} */
+.title {
+  font-size: 68px;
+}
+.subtitle {
+  font-size: 24px;
+}
+.btns button {
+  margin: 0 10px;
 }
 </style>
